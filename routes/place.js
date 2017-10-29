@@ -28,11 +28,10 @@ router.get('/:place_id', function(req, res, next) {
       });
 });
 
-router.options('/:place_id', cors());
-router.post('/:place_id', cors(), function(req, res, next) {
+router.post('/:place_id', function(req, res, next) {
   const data = req.body;
   const query_id = parseInt(req.params.place_id) || 0;
-  const id = data.id || 0;
+  const id = parseInt(data.id) || 0;
   if (query_id !== id) {
     return res.json({
       status: 'error',
