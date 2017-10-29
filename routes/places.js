@@ -60,6 +60,9 @@ router.get('/:latitude/:longitude/:filters?', function(req, res, next) {
   }, function(error, response, body) {
     if (!error && response.statusCode === 200) {
       var osmData = JSON.parse(body);
+      if (!osmData.elements)
+        osmData.elements = []
+
 
       var elements = osmData.elements.map(function(osmElement) {
         return Place.findOne({
