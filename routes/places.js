@@ -24,8 +24,12 @@ function annotateOsmData(osmData) {
   return osmData;
 }
 
+router.get('/:latitude/:longitude', function(req, res, next) {
+  next();
+});
 
-router.get('/:latitude/:longitude/:filters', function(req, res, next) {
+
+router.get('/:latitude/:longitude/:filters?', function(req, res, next) {
   const latitude = parseFloat(req.params.latitude);
   const longitude = parseFloat(req.params.longitude);
 
@@ -35,13 +39,17 @@ router.get('/:latitude/:longitude/:filters', function(req, res, next) {
   const north = latitude + offset;
   const east = longitude + offset;
 
-  const filters = req.params.filters.split(',');
+  const defaultFilters = '' +
+      'node["shop"="bakery"](' + south + ',' + west + ',' + north + ',' + east + ');\n' +
+      'node["shop"="restaurant"](' + south + ',' + west + ',' + north + ',' + east + ');\n';
+
+  const filters = (req.params.filters) ? req.params.filters.split(',') : [];
 
   const nodes = filters.map(function(filter) {
     return 'node["' + filter + '"="yes"](' + south + ',' + west + ',' + north + ',' + east + ');';
   });
 
-  const query = '[out:json][timeout:25];(' + nodes.join('\n') + '); out; >; out skel qt;';
+  const query = '[out:json][timeout:25];(' + nodes.join('\n') + defaultFilters + '); out; >; out skel qt;';
 
   console.log('query', query);
 
