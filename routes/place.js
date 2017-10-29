@@ -3,6 +3,7 @@ var Place = require('../models/place');
 
 var express = require('express');
 var router = express.Router();
+var cors = require('cors');
 
 /**
  * @param {int} osmId
@@ -27,7 +28,8 @@ router.get('/:place_id', function(req, res, next) {
       });
 });
 
-router.put('/:place_id', function(req, res, next) {
+router.options('/:place_id', cors());
+router.post('/:place_id', cors(), function(req, res, next) {
   const data = req.body;
   const query_id = parseInt(req.params.place_id) || 0;
   const id = data.id || 0;

@@ -40,13 +40,18 @@ router.get('/:latitude/:longitude/:filters?', function(req, res, next) {
   const east = longitude + offset;
 
   const defaultFilters = '' +
-      'node["shop"="bakery"](' + south + ',' + west + ',' + north + ',' + east + ');\n' +
-      'node["shop"="restaurant"](' + south + ',' + west + ',' + north + ',' + east + ');\n';
+      'node["shop"="bakery"](' + south + ',' + west + ',' + north + ',' + east + ');\n'
+//  +    'node["shop"="restaurant"](' + south + ',' + west + ',' + north + ',' + east + ');\n';
 
   const filters = (req.params.filters) ? req.params.filters.split(',') : [];
 
   const nodes = filters.map(function(filter) {
-    return 'node["' + filter + '"="yes"](' + south + ',' + west + ',' + north + ',' + east + ');';
+    const nodes = [
+      'node["' + filter + '"="yes"](' + south + ',' + west + ',' + north + ',' + east + ');',
+      'node["' + filter + '"="only"](' + south + ',' + west + ',' + north + ',' + east + ');'
+    ]
+
+    return nodes.join('\n');
   });
 
   const query = '[out:json][timeout:25];(' + nodes.join('\n') + defaultFilters + '); out; >; out skel qt;';
@@ -62,7 +67,6 @@ router.get('/:latitude/:longitude/:filters?', function(req, res, next) {
       var osmData = JSON.parse(body);
       if (!osmData.elements)
         osmData.elements = []
-
 
       var elements = osmData.elements.map(function(osmElement) {
         return Place.findOne({
